@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import {
   Layout, Menu, Breadcrumb, Icon, Table
 } from 'antd';
-import axios from 'axios';
+import { getAllPartners } from '../../services/partners';
 
 const {
   Header, Content, Footer, Sider,
@@ -30,11 +30,8 @@ class Main extends PureComponent {
   };
 
   componentDidMount() {
-    axios.get(`${process.env.REACT_APP_API_HOST}/partners`)
-      .then(response => {
-        console.log(response.data)
-        this.setState({ dataSource: response.data})
-      })
+    getAllPartners()
+      .then(data => this.setState({ dataSource: data }))
       .catch(err => console.log(err))
   }
 
