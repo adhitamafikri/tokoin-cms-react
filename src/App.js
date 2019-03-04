@@ -1,25 +1,69 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Switch, Route, Redirect } from 'react-router-dom';
+import PrivateRoutes from './routes/private';
+import PublicRoutes from './routes/public';
+
+import Main from './components/pages/Main';
+
+const mapPrivateRoutes = () => (
+  PrivateRoutes.map((route, key) => (
+    <PrivateRoute exact key={key} path={route.path} component={route.component} />
+  ))
+);
+
+const mapPublicRoutes = () => (
+  PublicRoutes.map((route, key) => (
+    <Route exact key={key} path={route.path} component={route.component} />
+  ))
+);
+
+const fakeAuth = {
+  isAuthenticated: false,
+  authenticate(cb) {
+    this.isAuthenticated = true;
+    setTimeout(cb, 100); // fake async
+  },
+  signout(cb) {
+    this.isAuthenticated = false;
+    setTimeout(cb, 100);
+  }
+};
+
+const PrivateRoute = ({ component: Component, ...rest }) => (
+  <Route {...rest}
+    render={props =>
+      fakeAuth.isAuthenticated ? (
+        <Component {...props} />
+      ) : (
+        <Redirect to={{
+          pathname: '/login',
+          state: { from: props.location }
+        }} />
+      )
+    }
+  />
+);
 
 class App extends Component {
+  state = {
+    isLoggedIn: false,
+    
+  };
+
+  login = () => {
+    fakeAuth.authenticate(() => {
+      this.setState()
+    })
+  }
+
   render() {
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
+      <div id='app'>
+        <Switch>
+          {/* { mapPublicRoutes() } */}
+          {/* { mapPrivateRoutes() } */}
+          <Route exact path='/' component={Main} />
+        </Switch>
       </div>
     );
   }
